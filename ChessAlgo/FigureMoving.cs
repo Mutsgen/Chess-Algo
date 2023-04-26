@@ -14,10 +14,10 @@ namespace Chess
 
         public Figure promotion { get; private set; }
 
-        public FigureMoving ( FigureOnSquare fs, Square to, Figure promotion = Figure.None )
+        public FigureMoving ( FigureOnSquare figureOnSquare, Square to, Figure promotion = Figure.None )
         {
-            this.figure = fs.figure;
-            this.from = fs.square;
+            this.figure = figureOnSquare.figure;
+            this.from = figureOnSquare.square;
             this.to = to;
             this.promotion = promotion;
         }

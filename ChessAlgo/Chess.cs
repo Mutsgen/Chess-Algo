@@ -25,7 +25,7 @@
         {
 
             FigureMoving figureMoving = new FigureMoving( move );
-            if ( !moves.CanMove( figureMoving ) )
+            if ( !moves.CanMove( figureMoving ) || board.IsCheckAfterMove( figureMoving ) )
             {
                 return this;
             }
@@ -45,27 +45,33 @@
         private void FindAllMoves ()
         {
             allMoves = new List<FigureMoving>();
-            foreach ( FigureOnSquare fs in board.YieldFigures() )
+            foreach ( FigureOnSquare figureOnSquare in board.YieldFigures() )
             {
                 foreach ( Square to in Square.YieldSquares() )
                 {
-                    FigureMoving fm = new FigureMoving( fs, to );
-                    if ( moves.CanMove( fm ) )
+                    FigureMoving figureMoving = new FigureMoving( figureOnSquare, to );
+
+                    if ( moves.CanMove( figureMoving ) && !board.IsCheckAfterMove( figureMoving ) )
                     {
-                        allMoves.Add( fm );
+                        allMoves.Add( figureMoving );
                     }
                 }
             }
         }
         public List<string> GetAllMoves ()
-        {   
+        {
             FindAllMoves();
             List<string> list = new List<string>();
-            foreach ( FigureMoving fm in allMoves )
+            foreach ( FigureMoving figureMoving in allMoves )
             {
-                list.Add( fm.ToString() );
+                list.Add( figureMoving.ToString() );
             }
             return list;
+        }
+
+        public bool IsCheck ()
+        {
+            return board.IsCheck();
         }
     }
 }

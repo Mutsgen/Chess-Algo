@@ -22,9 +22,6 @@ namespace Chess
             Init();
         }
 
-        /*
-         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-         */
         void Init ()
         {
             string[] partsFen = fen.Split();
@@ -32,10 +29,7 @@ namespace Chess
             InitFigurs( partsFen[0] );
             moveNumber = int.Parse( partsFen[5] );
             this.moveColor = partsFen[1] == "b" ? Color.black : Color.white;
-            /*  SetFigureAt( new Square( "a1" ), Figure.whiteKing );
-                SetFigureAt( new Square( "h8" ), Figure.blackKing );
-                this.moveColor = Color.white;
-                this.moveNumber = 0;*/
+
         }
         void InitFigurs ( string data )
         {
@@ -122,13 +116,53 @@ namespace Chess
 
         public IEnumerable<FigureOnSquare> YieldFigures ()
         {
-            foreach (Square square in Square.YieldSquares())
+            foreach ( Square square in Square.YieldSquares() )
             {
-                if(GetFigureAt(square).GetColor() == moveColor )
+                if ( GetFigureAt( square ).GetColor() == moveColor )
                 {
-                    yield return new FigureOnSquare(GetFigureAt(square), square);
+                    yield return new FigureOnSquare( GetFigureAt( square ), square );
                 }
             }
+        }
+
+        public bool IsCheck ()
+        {
+            Board after = new Board( fen );
+            after.moveColor = moveColor.FlipColor();
+            return after.CanEatKing();
+        }
+        public bool IsCheckAfterMove (FigureMoving figureMoving)
+        {
+            Board after = Move( figureMoving ); 
+            return after.CanEatKing();
+        }
+        public bool CanEatKing ()
+        {
+            Square badKing = FindBadKing();
+            Moves moves = new Moves( this );
+            foreach ( FigureOnSquare figureOnSquare in YieldFigures() )
+            {
+                FigureMoving figureMoving = new FigureMoving( figureOnSquare, badKing );
+                if ( moves.CanMove( figureMoving ) )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Square FindBadKing ()
+        {
+            Figure badKing = moveColor == Color.white ? Figure.blackKing : Figure.whiteKing;
+            foreach ( Square square in Square.YieldSquares() )
+            {
+                if ( GetFigureAt( square ) == badKing )
+                {
+                    return square;
+                }
+
+            }
+            return Square.none;
         }
     }
 }
